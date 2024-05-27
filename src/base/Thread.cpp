@@ -1,9 +1,9 @@
 #include "../../include/base/Thread.h"
+#include "../../include/base/Mutex.h"
 #include <stdexcept> // std::logic_error
 #include <cstdio> // snprintf
 
 namespace start {
-
 
 // 线程计数器
 Atomic<int> Thread::m_threadCount(0);
@@ -17,8 +17,9 @@ Thread::Thread(const std::string &name, const ThreadFunc &func)
       m_thread(0),
       m_started(false),
       m_joined(false),
-      m_parentThread(m_currentThread){
+      m_parentThread(m_currentThread){   
     setName();
+    start();
 }
 
 Thread::~Thread() {
@@ -65,6 +66,9 @@ void Thread::setName() {
 }
 
 Thread* Thread::getThis() {
+    if (m_currentThread == nullptr) {
+        m_currentThread = new Thread("main", [](){});
+    }
     return m_currentThread;
 }
 
